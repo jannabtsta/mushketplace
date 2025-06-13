@@ -1,4 +1,6 @@
 <?php
+require_once 'send_otp_mail.php';
+
 session_start();
 $conn = new mysqli("localhost", "root", "", "mushket");
 
@@ -16,9 +18,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["user_id"] = $user["id"];
             $_SESSION["role"] = $user["role"];
             $_SESSION["name"] = $user["name"];
+if ($user['role'] === 'farmer') {
+    $otp = rand(100000, 999999);
+$otp_str = strval($otp); // convert to string to match VARCHAR(6)
+$expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
+$user_id = intval($user['id']); // just to be explicit
 
-            if ($user["role"] == "farmer") {
-                header("Location: farmer.php");
+$update = $conn->prepare("UPDATE users SET otp_code = ?, otp_expiry = ? WHERE id = ?");
+$update->bind_param("ssi", $otp_str, $expiry, $user_id);
+
+    if ($update->execute()) {
+     
+        if (sendOTPEmail($user['email'], $otp)) {
+            $_SESSION["pending_user_id"] = $user["id"];
+            header("Location: verify_otp.php");
+            exit();
+        } else {
+            echo "❌ Failed to send OTP email.";
+        }
+    } else {
+        echo "❌ Failed to update OTP in database.";
+    }
+
             } else {
                 header("Location: consumer.php");
             }

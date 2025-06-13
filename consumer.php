@@ -76,3 +76,29 @@ $result = $conn->query("
 
 <a href="order_status.php">Check My Orders</a><br>
 <a href="logout.php">Logout</a>
+
+
+
+<div id="paypal-button-container"></div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=ATEnxAyBzkZI3C4FuBisI1dCSGhUmcjKpI7VTpyRpNc1m346Gk2xie_MyYYnv2bsb3U0Uckz_sRMty23"></script>
+<script>
+paypal.Buttons({
+    createOrder: function(data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: '100.00' // Replace with your actual order total
+                }
+            }]
+        });
+    },
+    onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+            alert('✅ Payment completed by ' + details.payer.name.given_name);
+            // You can now save the order/payment in your DB
+            window.location.href = "order_status.php";
+        });
+    }
+}).render('#paypal-button-container');
+</script>

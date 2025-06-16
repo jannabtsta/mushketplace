@@ -102,3 +102,13 @@ paypal.Buttons({
     }
 }).render('#paypal-button-container');
 </script>
+
+<div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+    <h3>Want to become a vendor?</h3>
+    <p>Sell your products on our marketplace by completing vendor verification.</p>
+    <a href="vendor_verification_form.php" style="text-decoration: none;">
+        <button style="padding: 8px 16px; background-color: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
+            Start Vendor Verification
+        </button>
+    </a>
+</div>

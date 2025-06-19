@@ -2,7 +2,7 @@
 require_once 'send_otp_mail.php';
 require_once 'login_tracker.php';
 
-// Try to include backup scheduler, but don't crash if it fails
+
 if (file_exists(__DIR__ . '/backup_scheduler.php')) {
     require_once 'backup_scheduler.php';
 }
@@ -10,10 +10,9 @@ if (file_exists(__DIR__ . '/backup_scheduler.php')) {
 session_start();
 $conn = new mysqli("localhost", "root", "", "mushket");
 
-// Initialize login tracker
+
 $loginTracker = new LoginTracker($conn);
 
-// Check for scheduled backups (only if BackupScheduler class exists)
 if (class_exists('BackupScheduler') && (!isset($_SESSION['last_backup_check']) || (time() - $_SESSION['last_backup_check']) > 3600)) {
     try {
         $scheduler = new BackupScheduler();
@@ -35,17 +34,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($user = $result->fetch_assoc()) {
         if (password_verify($password, $user['password'])) {
-            // Log successful login attempt
+         
             $loginTracker->logLoginAttempt($user['id'], true);
             
-            // Check for suspicious activity
+            
             $securityCheck = $loginTracker->checkForSuspiciousActivity($user['id']);
             
             $_SESSION["user_id"] = $user["id"];
             $_SESSION["role"] = $user["role"];
             $_SESSION["name"] = $user["name"];
             
-            // Send security alert if new device/IP
+            
             if ($securityCheck['should_alert']) {
                 $deviceInfo = $loginTracker->getDeviceFingerprint();
                 $ipAddress = $loginTracker->getRealIpAddress();
@@ -80,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            // Log failed login attempt
+            
             if ($user) {
                 $loginTracker->logLoginAttempt($user['id'], false);
             }

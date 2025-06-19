@@ -21,13 +21,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $current_time = date("Y-m-d H:i:s");
 
     if ($user && $user["otp_code"] === $input_otp && $current_time <= $user["otp_expiry"]) {
-        // OTP is valid, complete login
+      
         $_SESSION["user_id"] = $user["id"];
         $_SESSION["role"] = $user["role"];
         $_SESSION["name"] = $user["name"];
         unset($_SESSION["pending_user_id"]);
 
-        // Clear OTP
+      
         $conn->query("UPDATE users SET otp_code=NULL, otp_expiry=NULL WHERE id=$user_id");
 
         header("Location: farmer.php");

@@ -3,7 +3,7 @@ session_start();
 require_once 'backup_manager.php';
 require_once 'backup_scheduler.php';
 
-// Check if user is admin (you might want to add role checking)
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
     exit();
@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 $backupManager = new BackupManager();
 $scheduler = new BackupScheduler();
 
-// Handle backup actions
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['create_backup'])) {
         $result = $backupManager->createDatabaseBackup();

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Simple admin check (replace with real auth in production)
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: index.php");
     exit();
@@ -21,10 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("isi", $adminId, $notes, $verificationId);
         $stmt->execute();
 
-        // Update user role
+        
         $conn->query("UPDATE users SET role = 'farmer' WHERE id = (SELECT user_id FROM vendor_verification WHERE id = $verificationId)");
 
-        // Send email (you must configure your sendOTPEmail function to work for general use)
+        
         require_once 'send_otp_mail.php';
         sendOTPEmail($email, "✅ Your vendor verification has been approved! You can now list mushrooms on Mushketplace.");
 
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all pending verifications
+
 $result = $conn->query("SELECT vv.*, u.email FROM vendor_verification vv JOIN users u ON vv.user_id = u.id WHERE verification_status = 'pending'");
 ?>
 

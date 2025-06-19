@@ -11,7 +11,7 @@ $conn = new mysqli("localhost", "root", "", "mushket");
 $verification = new VendorVerification($conn);
 $verificationStatus = $verification->getVerificationStatus($_SESSION['user_id']);
 
-// Check if vendor is verified
+
 if (!$verificationStatus || $verificationStatus['verification_status'] !== 'approved') {
 ?>
 <!DOCTYPE html>
@@ -96,7 +96,7 @@ if (!$verificationStatus || $verificationStatus['verification_status'] !== 'appr
 <?php exit(); } ?>
 
 <?php
-// Form section if verified
+
 $user_id = $_SESSION['user_id'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

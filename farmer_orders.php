@@ -9,7 +9,7 @@ $conn = new mysqli("localhost", "root", "", "mushket");
 $farmer_id = $_SESSION["user_id"];
 $today = date('Y-m-d');
 
-// Handle delivery form submission
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mark_delivery'])) {
     $order_id = intval($_POST['order_id']);
     $rider_name = $_POST['rider_name'];
@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mark_delivery'])) {
     $stmt->close();
 }
 
-// Fetch today's orders
+
 $result = $conn->query("
     SELECT orders.*, users.name AS consumer_name
     FROM orders

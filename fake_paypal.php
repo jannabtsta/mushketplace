@@ -2,7 +2,7 @@
 session_start();
 $conn = new mysqli("localhost", "root", "", "mushket");
 
-// Safety check: confirm user is a logged-in consumer
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consumer') {
     header("Location: index.php");
     exit();
@@ -83,7 +83,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consumer') {
         $quantity = floatval($_POST["quantity"]);
         $consumer_id = intval($_POST["consumer_id"]);
 
-        // Fetch available stock
+
         $stmt = $conn->prepare("SELECT available_kg FROM stock WHERE id = ?");
         $stmt->bind_param("i", $stock_id);
         $stmt->execute();
@@ -97,17 +97,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consumer') {
             exit();
         }
 
-        // Simulate "successful payment"
+     
         echo "<h2>✅ Payment Simulated Successfully!</h2>";
         echo "<p>Processing your order...</p>";
 
-        // Insert into orders table
+
         $stmt = $conn->prepare("INSERT INTO orders (consumer_id, farmer_id, stock_id, quantity_kg) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("iiid", $consumer_id, $farmer_id, $stock_id, $quantity);
         $stmt->execute();
         $stmt->close();
 
-        // Subtract from stock
+ 
         $stmt = $conn->prepare("UPDATE stock SET available_kg = available_kg - ? WHERE id = ?");
         $stmt->bind_param("di", $quantity, $stock_id);
         $stmt->execute();

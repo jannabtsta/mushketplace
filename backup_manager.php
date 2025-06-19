@@ -15,7 +15,7 @@ class BackupManager {
         $this->backupDir = __DIR__ . '/backups/';
         $this->encryptionKey = $this->getEncryptionKey();
         
-        // Create backup directory if it doesn't exist
+        
         if (!is_dir($this->backupDir)) {
             mkdir($this->backupDir, 0755, true);
         }
@@ -25,10 +25,10 @@ class BackupManager {
         $keyFile = __DIR__ . '/backup_key.txt';
         
         if (!file_exists($keyFile)) {
-            // Generate a new encryption key
+            
             $key = bin2hex(random_bytes(32));
             file_put_contents($keyFile, $key);
-            chmod($keyFile, 0600); // Restrict permissions
+            chmod($keyFile, 0600); 
         }
         
         return file_get_contents($keyFile);
@@ -39,10 +39,10 @@ class BackupManager {
         $timestamp = date('Y-m-d_H-i-s');
         $backupFile = $this->backupDir . "mushket_backup_{$timestamp}.sql";
         
-        // Path to mysqldump
+        
         $mysqldump = 'C:\\xampp\\mysql\\bin\\mysqldump.exe';
 
-        // Build command with output redirection
+        
         $command = sprintf(
             '"%s" --user=%s %s 2>&1',
             $mysqldump,
@@ -50,19 +50,19 @@ class BackupManager {
             escapeshellarg($this->dbName)
         );
 
-        // Run the command and capture output
+        
         $output = [];
         exec($command . " > " . escapeshellarg($backupFile), $output, $returnCode);
 
         if ($returnCode === 0 && file_exists($backupFile)) {
-            // Encrypt and delete plain .sql file
+            
             $encryptedFile = $this->encryptBackupFile($backupFile);
             unlink($backupFile);
             
             $this->logBackupActivity("Database backup created successfully: " . basename($encryptedFile));
             return $encryptedFile;
         } else {
-            // Logging error output
+            
             echo "<pre>❌ mysqldump command failed with code $returnCode</pre>";
             echo "<pre>🔧 Command used: $command > $backupFile</pre>";
             echo "<pre>📄 Output:\n" . implode("\n", $output) . "</pre>";
@@ -90,7 +90,7 @@ class BackupManager {
         $iv = random_bytes(16);
         $encrypted = openssl_encrypt($data, $method, hex2bin($this->encryptionKey), 0, $iv);
         
-        // Prepend IV to encrypted data
+        
         return base64_encode($iv . $encrypted);
     }
     
@@ -107,22 +107,22 @@ class BackupManager {
         try {
             $conn = new mysqli($this->dbHost, $this->dbUser, $this->dbPass, $this->dbName);
             
-            // Get user data
+            
             $userData = [];
             
-            // Users table
+            
             $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
             $stmt->bind_param("i", $userId);
             $stmt->execute();
             $userData['user'] = $stmt->get_result()->fetch_assoc();
             
-            // Login attempts
+            
             $stmt = $conn->prepare("SELECT * FROM login_attempts WHERE user_id = ?");
             $stmt->bind_param("i", $userId);
             $stmt->execute();
             $userData['login_attempts'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             
-            // Add other tables as needed (products, orders, etc.)
+            
             
             $timestamp = date('Y-m-d_H-i-s');
             $userBackupFile = $this->backupDir . "user_{$userId}_backup_{$timestamp}.json";
@@ -180,7 +180,7 @@ class BackupManager {
     }
     
     public function scheduleAutomaticBackups() {
-        // This would typically be called by a cron job
+      
         $this->createDatabaseBackup();
         $this->cleanOldBackups();
         return true;

@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>🍄MUSHKETPLACE</title>
 
-    <!-- Google Font -->
+   
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
@@ -141,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        /* 🎯 Beautiful Title */
+       
         .login-container h2 {
             font-family: "Jua", sans-serif; 
             font-size: 38px;

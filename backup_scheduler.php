@@ -1,14 +1,8 @@
 <?php
-// Add this require statement at the top
+
 require_once 'backup_manager.php';
 
-// Press Win + R, type taskschd.msc
-// Click "Create Basic Task"
-// Name: "Mushketplace Auto Backup"
-// Trigger: Daily (or whatever frequency you want)
-// Time: Choose when to run (e.g., 2:00 AM)
-// Action: "Start a program"
-// Program: C:\xampp\htdocs\Mushketplace_IAS\mushketplace\run_backup.bat
+
 
 class BackupScheduler {
     private $backupManager;
@@ -27,7 +21,7 @@ class BackupScheduler {
             if ($currentTime >= $backup['next_run']) {
                 $this->runBackup($backup['type']);
                 
-                // Update next run time
+                
                 $schedule[$key]['next_run'] = $this->calculateNextRun($backup['frequency']);
                 $schedule[$key]['last_run'] = $currentTime;
             }
@@ -38,7 +32,7 @@ class BackupScheduler {
     
     private function getSchedule() {
         if (!file_exists($this->scheduleFile)) {
-            // Default schedule
+
             $defaultSchedule = [
                 'daily_backup' => [
                     'type' => 'database',

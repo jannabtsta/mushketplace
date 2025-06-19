@@ -80,7 +80,7 @@ class LoginTracker {
         $ipAddress = $this->getRealIpAddress();
         $deviceInfo = $this->getDeviceFingerprint();
         
-        // Check if this IP/device combo has been used before
+
         $stmt = $this->conn->prepare("
             SELECT COUNT(*) as count FROM login_attempts 
             WHERE user_id = ? AND ip_address = ? AND is_successful = 1
@@ -91,7 +91,7 @@ class LoginTracker {
         $result = $stmt->get_result();
         $ipHistory = $result->fetch_assoc();
         
-        // Check device fingerprint
+    
         $stmt = $this->conn->prepare("
             SELECT COUNT(*) as count FROM login_attempts 
             WHERE user_id = ? AND JSON_EXTRACT(device_info, '$.fingerprint') = ? 

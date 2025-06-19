@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consumer') {
 $conn = new mysqli("localhost", "root", "", "mushket");
 $consumer_id = $_SESSION["user_id"];
 
-// Fetch all farmers with available stock today
+
 $today = date('Y-m-d');
 $result = $conn->query("
     SELECT stock.id as stock_id, users.id as farmer_id, users.name, stock.available_kg
@@ -24,7 +24,7 @@ $result = $conn->query("
     <meta charset="UTF-8">
     <title>🍄 Consumer Dashboard</title>
 
-    <!-- Jua Google Font -->
+  
     <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 
     <style>
@@ -197,7 +197,7 @@ $result = $conn->query("
             <button type="submit">Confirm Payment</button>
         </form>
 
-        <!-- ✅ PayPal Demo -->
+
         <div class="paypal-section">
             <h3>OR Pay with PayPal</h3>
             <div id="paypal-button-container"></div>

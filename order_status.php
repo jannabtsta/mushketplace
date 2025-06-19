@@ -8,13 +8,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consumer') {
 $conn = new mysqli("localhost", "root", "", "mushket");
 $consumer_id = $_SESSION["user_id"];
 
-// Confirm delivery
+
 if (isset($_GET["confirm"])) {
     $order_id = $_GET["confirm"];
     $conn->query("UPDATE orders SET status='delivered' WHERE id=$order_id AND consumer_id=$consumer_id");
 }
 
-// Fetch orders for this consumer
+
 $result = $conn->query("
     SELECT orders.*, users.name AS farmer_name
     FROM orders

@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $conn = new mysqli("localhost", "root", "", "mushket");
 $userId = $_SESSION['user_id'];
 
-// Get recent login attempts
+
 $stmt = $conn->prepare("
     SELECT ip_address, device_info, browser_info, login_time, is_successful 
     FROM login_attempts 

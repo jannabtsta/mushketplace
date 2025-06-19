@@ -3,7 +3,7 @@ class VendorVerification {
     private $conn;
     private $uploadDir;
     private $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
-    private $maxFileSize = 5 * 1024 * 1024; // 5MB
+    private $maxFileSize = 5 * 1024 * 1024; 
 
     public function __construct($connection) {
         $this->conn = $connection;
@@ -65,7 +65,7 @@ class VendorVerification {
                 }
             }
 
-            // Mock validation logic
+           
            $validation_notes = (strpos(strtolower($data['business_name']), 'invalid') !== false)
     ? '❌ Document failed mock validation: suspicious name.'
     : '✅ Simulated validation passed: name and documents appear valid.';
@@ -98,7 +98,7 @@ $stmt->bind_param("isssssss",
         }
     }
 
-    // (Other methods stay the same...)
+  
     public function getVerificationStatus($userId) {
     $stmt = $this->conn->prepare("SELECT * FROM vendor_verification WHERE user_id = ?");
     $stmt->bind_param("i", $userId);
@@ -107,12 +107,12 @@ $stmt->bind_param("isssssss",
 }
 
 private function uploadDocument($file, $documentType, $userId) {
-    // Validate file
+  
     if (!$this->validateFile($file)) {
         return ['success' => false, 'message' => 'Invalid file format or size'];
     }
 
-    // Generate secure filename
+   
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = $userId . '_' . $documentType . '_' . time() . '.' . $extension;
     $filepath = $this->uploadDir . $filename;
@@ -125,17 +125,17 @@ private function uploadDocument($file, $documentType, $userId) {
 }
 
 private function validateFile($file) {
-    // Check file size
+   
     if ($file['size'] > $this->maxFileSize) {
         return false;
     }
 
-    // Check file type
+    
     if (!in_array($file['type'], $this->allowedTypes)) {
         return false;
     }
 
-    // Check for upload errors
+    
     if ($file['error'] !== UPLOAD_ERR_OK) {
         return false;
     }

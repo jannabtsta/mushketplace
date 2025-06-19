@@ -52,7 +52,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $loginTracker->sendSecurityAlert($user['email'], $ipAddress, $deviceInfo);
             }
             
-            if ($user['role'] === 'farmer') {
+           if ($user['role'] === 'admin') {
+    header("Location: admin_verify.php");
+    exit();
+} elseif ($user['role'] === 'farmer') {
                 $otp = rand(100000, 999999);
                 $otp_str = strval($otp);
                 $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
@@ -90,10 +93,131 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<form method="POST">
-    <h2>Login</h2>
-    Email: <input type="email" name="email" required><br>
-    Password: <input type="password" name="password" required><br>
-    <button type="submit">Login</button>
-</form>
-<p>Don't have an account? <a href="register.php">Register here</a></p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🍄MUSHKETPLACE</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('mushketBG.png') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            backdrop-filter: blur(12px);
+            background: #FFAAAA;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            width: 320px;
+            text-align: center;
+            color: #fff;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 🎯 Beautiful Title */
+        .login-container h2 {
+            font-family: "Jua", sans-serif; 
+            font-size: 38px;
+            font-weight: 700;
+            color:rgb(65, 12, 12);
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            transform: scale(1.03);
+        }
+
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .login-container input[type="email"]:focus,
+        .login-container input[type="password"]:focus {
+            box-shadow: 0 0 5px #7affd4;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: rgb(65, 12, 12);
+            border: none;
+            border-radius: 10px;
+             color:rgb(255, 247, 247);
+                 font-family: 'Jua', sans-serif;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        .login-container button:hover {
+            background-color: #FF9898;
+            transform: scale(1.02);
+        }
+
+        .login-container p {
+            color:rgb(255, 252, 248);
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .login-container a {
+            color:rgb(255, 254, 252);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-container a:hover {
+            text-decoration: underline;
+        }
+
+   
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <form method="POST">
+            <h2>Mushketplace</h2>
+            <input type="email" name="email" placeholder="Email address" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="register.php">Register here</a></p>
+          <h2>🍄 </h2>
+    </div>
+</body>
+</html>

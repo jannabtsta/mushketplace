@@ -34,42 +34,47 @@ class BackupManager {
         return file_get_contents($keyFile);
     }
     
-    public function createDatabaseBackup() {
-        try {
-            $timestamp = date('Y-m-d_H-i-s');
-            $backupFile = $this->backupDir . "mushket_backup_{$timestamp}.sql";
+  public function createDatabaseBackup() {
+    try {
+        $timestamp = date('Y-m-d_H-i-s');
+        $backupFile = $this->backupDir . "mushket_backup_{$timestamp}.sql";
+        
+        // Path to mysqldump
+        $mysqldump = 'C:\\xampp\\mysql\\bin\\mysqldump.exe';
+
+        // Build command with output redirection
+        $command = sprintf(
+            '"%s" --user=%s %s 2>&1',
+            $mysqldump,
+            escapeshellarg($this->dbUser),
+            escapeshellarg($this->dbName)
+        );
+
+        // Run the command and capture output
+        $output = [];
+        exec($command . " > " . escapeshellarg($backupFile), $output, $returnCode);
+
+        if ($returnCode === 0 && file_exists($backupFile)) {
+            // Encrypt and delete plain .sql file
+            $encryptedFile = $this->encryptBackupFile($backupFile);
+            unlink($backupFile);
             
-            // Use mysqldump command
-            $command = sprintf(
-                'mysqldump --host=%s --user=%s --password=%s --single-transaction --routines --triggers %s > %s',
-                escapeshellarg($this->dbHost),
-                escapeshellarg($this->dbUser),
-                escapeshellarg($this->dbPass),
-                escapeshellarg($this->dbName),
-                escapeshellarg($backupFile)
-            );
-            
-            exec($command, $output, $returnCode);
-            
-            if ($returnCode === 0 && file_exists($backupFile)) {
-                // Encrypt the backup file
-                $encryptedFile = $this->encryptBackupFile($backupFile);
-                
-                // Remove unencrypted file
-                unlink($backupFile);
-                
-                $this->logBackupActivity("Database backup created successfully: " . basename($encryptedFile));
-                return $encryptedFile;
-            } else {
-                throw new Exception("mysqldump failed with return code: $returnCode");
-            }
-            
-        } catch (Exception $e) {
-            $this->logBackupActivity("Backup failed: " . $e->getMessage(), 'ERROR');
+            $this->logBackupActivity("Database backup created successfully: " . basename($encryptedFile));
+            return $encryptedFile;
+        } else {
+            // Logging error output
+            echo "<pre>❌ mysqldump command failed with code $returnCode</pre>";
+            echo "<pre>🔧 Command used: $command > $backupFile</pre>";
+            echo "<pre>📄 Output:\n" . implode("\n", $output) . "</pre>";
+            $this->logBackupActivity("Backup failed: mysqldump error code $returnCode", 'ERROR');
             return false;
         }
+
+    } catch (Exception $e) {
+        $this->logBackupActivity("Backup failed: " . $e->getMessage(), 'ERROR');
+        return false;
     }
-    
+}
     private function encryptBackupFile($filePath) {
         $data = file_get_contents($filePath);
         $encryptedData = $this->encryptData($data);

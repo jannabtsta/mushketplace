@@ -11,156 +11,208 @@ $conn = new mysqli("localhost", "root", "", "mushket");
 $verification = new VendorVerification($conn);
 $userId = $_SESSION['user_id'];
 
-// Check current verification status
 $currentStatus = $verification->getVerificationStatus($userId);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         'business_name' => $_POST['business_name'],
-        'business_license_number' => $_POST['business_license_number'],
-        'tax_id' => $_POST['tax_id'],
         'business_address' => $_POST['business_address'],
         'business_phone' => $_POST['business_phone'],
         'business_email' => $_POST['business_email']
     ];
-    
+
     $result = $verification->submitVerificationRequest($userId, $data, $_FILES);
+    if ($result['success']) {
+    header("Location: farmer.php");
+    exit();
+}
     $message = $result['message'];
     $messageType = $result['success'] ? 'success' : 'error';
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Vendor Verification</title>
+    <meta charset="UTF-8">
+    <title>🍄 Vendor Verification</title>
+
+    <!-- Jua Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .form-group { margin: 15px 0; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="email"], input[type="tel"], textarea, input[type="file"] { 
-            width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px; 
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #ffe5ec, #fadadd);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        button { padding: 12px 24px; background-color: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #005a87; }
-        .message { padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
-        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
-        .status-badge { padding: 5px 10px; border-radius: 3px; color: white; font-weight: bold; }
-        .pending { background-color: #ffc107; }
-        .approved { background-color: #28a745; }
-        .rejected { background-color: #dc3545; }
-        .under-review { background-color: #17a2b8; }
-        .required { color: red; }
-        .file-info { font-size: 12px; color: #666; margin-top: 5px; }
+
+        .container {
+            background-color: #fff;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.7s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-family: 'Jua', sans-serif;
+            text-align: center;
+            font-size: 34px;
+            color: #7c2d12;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: block;
+            font-size: 15px;
+            color: #444;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            background-color: #a8323e;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-family: 'Jua', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+            margin-top: 10px;
+        }
+        
+
+        button:hover {
+            background-color: #d23d3d;
+            transform: scale(1.02);
+        }
+
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        p {
+            font-size: 14px;
+            color: #444;
+            margin-top: 15px;
+            text-align: center;
+        }
+            a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+        }
+
+        a:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
-    <h1>Vendor Verification</h1>
-    
+<div class="container">
+    <h2>🍄 Vendor Verification</h2>
+
     <?php if (isset($message)): ?>
         <div class="message <?php echo $messageType; ?>">
             <?php echo htmlspecialchars($message); ?>
         </div>
     <?php endif; ?>
-    
-    <?php if ($currentStatus): ?>
-        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3>Current Status: 
-                <span class="status-badge <?php echo $currentStatus['verification_status']; ?>">
-                    <?php echo strtoupper($currentStatus['verification_status']); ?>
-                </span>
-            </h3>
-            
-            <?php if ($currentStatus['verification_status'] === 'approved'): ?>
-                <p>✅ Your vendor account has been approved! You can now list products.</p>
-                <a href="farmer.php">Go to Farmer Dashboard</a>
-            <?php elseif ($currentStatus['verification_status'] === 'rejected'): ?>
-                <p>❌ Your verification was rejected.</p>
-                <p><strong>Reason:</strong> <?php echo htmlspecialchars($currentStatus['rejection_reason']); ?></p>
-                <p>You can resubmit with corrected information below.</p>
-            <?php elseif ($currentStatus['verification_status'] === 'pending'): ?>
-                <p>⏳ Your verification request is pending review. We'll notify you once it's processed.</p>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
-    
+
     <?php if (!$currentStatus || $currentStatus['verification_status'] === 'rejected'): ?>
-    <form method="POST" enctype="multipart/form-data">
-        <h2>Business Information</h2>
-        
-        <div class="form-group">
-            <label for="business_name">Business Name <span class="required">*</span></label>
-            <input type="text" name="business_name" id="business_name" required 
-                   value="<?php echo htmlspecialchars($currentStatus['business_name'] ?? ''); ?>">
-        </div>
-        
-        <div class="form-group">
-            <label for="business_license_number">Business License Number</label>
-            <input type="text" name="business_license_number" id="business_license_number"
-                   value="<?php echo htmlspecialchars($currentStatus['business_license_number'] ?? ''); ?>">
-        </div>
-        
-        <div class="form-group">
-            <label for="tax_id">Tax ID / TIN</label>
-            <input type="text" name="tax_id" id="tax_id"
-                   value="<?php echo htmlspecialchars($currentStatus['tax_id'] ?? ''); ?>">
-        </div>
-        
-        <div class="form-group">
-            <label for="business_address">Business Address <span class="required">*</span></label>
-            <textarea name="business_address" id="business_address" rows="3" required><?php echo htmlspecialchars($currentStatus['business_address'] ?? ''); ?></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label for="business_phone">Business Phone <span class="required">*</span></label>
-            <input type="tel" name="business_phone" id="business_phone" required
-                   value="<?php echo htmlspecialchars($currentStatus['business_phone'] ?? ''); ?>">
-        </div>
-        
-        <div class="form-group">
-            <label for="business_email">Business Email <span class="required">*</span></label>
-            <input type="email" name="business_email" id="business_email" required
-                   value="<?php echo htmlspecialchars($currentStatus['business_email'] ?? ''); ?>">
-        </div>
-        
-        <h2>Required Documents</h2>
-        <p>Please upload clear, readable copies of the following documents (JPEG, PNG, or PDF format, max 5MB each):</p>
-        
-        <div class="form-group">
-            <label for="business_license_doc">Business License Document</label>
-            <input type="file" name="business_license_doc" id="business_license_doc" accept=".jpg,.jpeg,.png,.pdf">
-            <div class="file-info">Upload your business registration or license document</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="tax_certificate_doc">Tax Certificate</label>
-            <input type="file" name="tax_certificate_doc" id="tax_certificate_doc" accept=".jpg,.jpeg,.png,.pdf">
-            <div class="file-info">Tax registration certificate or similar document</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="id_document">Government-issued ID <span class="required">*</span></label>
-            <input type="file" name="id_document" id="id_document" accept=".jpg,.jpeg,.png,.pdf" required>
-            <div class="file-info">Driver's license, passport, or national ID</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="address_proof">Proof of Address</label>
-            <input type="file" name="address_proof" id="address_proof" accept=".jpg,.jpeg,.png,.pdf">
-            <div class="file-info">Utility bill, bank statement, or lease agreement</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="bank_statement">Bank Statement</label>
-            <input type="file" name="bank_statement" id="bank_statement" accept=".jpg,.jpeg,.png,.pdf">
-            <div class="file-info">Recent bank statement for business account verification</div>
-        </div>
-        
-        <button type="submit">Submit Verification Request</button>
-    </form>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="business_name">Business Name *</label>
+                <input type="text" id="business_name" name="business_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="business_address">Business Address *</label>
+                <textarea id="business_address" name="business_address" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="business_phone">Phone Number *</label>
+                <input type="tel" id="business_phone" name="business_phone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="business_email">Business Email *</label>
+                <input type="email" id="business_email" name="business_email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_document1">Valid ID #1 *</label>
+                <input type="file" id="id_document1" name="id_document1" accept=".jpg,.jpeg,.png,.pdf" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_document2">Valid ID #2 *</label>
+                <input type="file" id="id_document2" name="id_document2" accept=".jpg,.jpeg,.png,.pdf" required>
+            </div>
+
+            <button type="submit">Submit Verification</button>
+        </form>
+    <?php else: ?>
+        <p><strong>Status:</strong> <?php echo strtoupper($currentStatus['verification_status']); ?></p>
+        <p><strong>Validation Notes:</strong> <?php echo htmlspecialchars($currentStatus['validation_notes'] ?? 'N/A'); ?></p>
     <?php endif; ?>
-    
-    <p><a href="consumer.php">← Back to Dashboard</a></p>
+    <a href="index.php">← Back to Dashboard</a>
+</div>
 </body>
 </html>
